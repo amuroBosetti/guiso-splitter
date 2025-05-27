@@ -1,5 +1,14 @@
 # guiso-splitter Backlog
 
+## Technical Debt
+
+### Authentication & User Management
+- [ ] **Replace database function with backend service for user signup**
+  - **Problem**: Currently using a PostgreSQL function (`handle_new_user`) to create user profiles, which is not ideal for maintainability and security.
+  - **Solution**: Implement a backend service (e.g., using Supabase Edge Functions or a separate API) to handle user registration and profile creation.
+  - **Impact**: Improves security, makes the system more maintainable, and provides better error handling and logging.
+  - **Effort**: Medium
+
 ## Product Vision
 A simple, frictionless PWA for organizing and splitting expenses for group food gatherings, with features tailored to our specific needs.
 

@@ -1,12 +1,12 @@
 -- Allow public read access to users (for autocomplete, etc.)
 CREATE POLICY "Allow public read access to users"
-ON public.users
+ON public.user_profiles
 FOR SELECT
 USING (true);
 
 -- Allow users to insert into users
 CREATE POLICY "Allow insert for users"
-ON public.users
+ON public.user_profiles
 FOR INSERT
 WITH CHECK (true);
 

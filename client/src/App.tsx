@@ -1,6 +1,13 @@
-import { CssBaseline, ThemeProvider, createTheme, Container, Typography, Box } from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme, Container, Typography, Box, AppBar, Toolbar, Button, Avatar } from '@mui/material';
 import { teal, deepOrange } from '@mui/material/colors';
-import EventList from './components/EventList.tsx';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import EventList from './components/EventList';
+import EventDetail from './components/EventDetail';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+import { Profile } from './pages/Profile';
 
 // Create a theme instance
 const theme = createTheme({
@@ -40,32 +47,105 @@ const theme = createTheme({
   },
 });
 
-function App() {
+function Layout() {
+  const { user, profile, signOut } = useAuth();
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          bgcolor: 'background.default',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ py: 4, flex: 1 }}>
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography variant="h1" component="h1">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: 'background.default',
+      }}
+    >
+      <AppBar position="static" color="default" elevation={0}>
+        <Container maxWidth="lg">
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+            <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
               Guiso Splitter
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Split food expenses with friends, the easy way
-            </Typography>
-          </Box>
-          
-          <EventList />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {user ? (
+                <>
+                  <Button 
+                    color="inherit" 
+                    component={Link} 
+                    to="/profile"
+                    startIcon={
+                      <Avatar 
+                        sx={{ 
+                          width: 24, 
+                          height: 24, 
+                          bgcolor: 'primary.main',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        {profile?.display_name ? profile.display_name.charAt(0).toUpperCase() : 'U'}
+                      </Avatar>
+                    }
+                  >
+                    {profile?.display_name || 'Profile'}
+                  </Button>
+                  <Button 
+                    color="inherit" 
+                    variant="outlined" 
+                    onClick={signOut}
+                    size="small"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button color="inherit" component={Link} to="/login">
+                    Sign In
+                  </Button>
+                  <Button color="primary" variant="contained" component={Link} to="/signup" sx={{ ml: 1 }}>
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Toolbar>
         </Container>
-      </Box>
-    </ThemeProvider>
+      </AppBar>
+      <Container maxWidth="lg" sx={{ py: 4, flex: 1 }}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <EventList />
+            </ProtectedRoute>
+          } />
+          <Route path="/events/:id" element={
+            <ProtectedRoute>
+              <EventDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Container>
+    </Box>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Layout />
+        </ThemeProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

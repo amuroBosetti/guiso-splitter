@@ -4,6 +4,28 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export type Database = {
   public: {
     Tables: {
+      users: {
+        Row: {
+          id: string;
+          auth_id: string;
+          display_name: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          auth_id: string;
+          display_name: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          auth_id?: string;
+          display_name?: string;
+          updated_at?: string;
+        };
+      };
       events: {
         Row: {
           id: string;

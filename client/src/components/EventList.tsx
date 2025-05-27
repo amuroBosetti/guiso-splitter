@@ -1,25 +1,32 @@
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Button, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Typography, 
+import { Link } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardActionArea,
+  CardActions,
   Divider,
+  IconButton,
+  Typography,
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Alert,
-  IconButton
+  Alert
 } from '@mui/material';
-import { Add as AddIcon, Close as CloseIcon, PersonAdd as PersonAddIcon, Person as PersonIcon } from '@mui/icons-material';
-import { GuestRepository } from '../repositories/GuestRepository';
-import type { Guest } from '../repositories/GuestRepository';
+import {
+  Add as AddIcon,
+  PersonAdd as PersonAddIcon,
+  Close as CloseIcon,
+  Person as PersonIcon,
+  ArrowForward as ArrowForwardIcon
+} from '@mui/icons-material';
 import { supabase } from '../lib/supabase';
+import { GuestRepository, type Guest } from '../repositories/GuestRepository';
 
 import type { Tables } from '../lib/supabase';
 
@@ -43,15 +50,15 @@ const EventList = () => {
       try {
         setLoading(true);
         setLoadingGuests(true);
-        
+
         // Fetch events and guests in parallel
         const [eventsData, guestsData] = await Promise.all([
           supabase.from('events').select('*').order('event_date', { ascending: false }),
           GuestRepository.getAllEventGuests()
         ]);
-        
+
         if (eventsData.error) throw eventsData.error;
-        
+
         setEvents(eventsData.data || []);
         setGuestsByEvent(guestsData);
       } catch (err) {
@@ -62,10 +69,10 @@ const EventList = () => {
         setLoadingGuests(false);
       }
     };
-    
+
     fetchAllData();
   }, []);
-  
+
 
 
   const handleOpen = () => {
@@ -108,19 +115,19 @@ const EventList = () => {
 
     try {
       const guest = await GuestRepository.addGuestToEvent(
-        { 
-          name: newGuest.name.trim(),
+        {
+          display_name: newGuest.name.trim(),
           email: newGuest.email?.trim()
         },
         selectedEvent.id
       );
-      
+
       // Update the local state with the new guest
       updateGuestsForEvent(selectedEvent.id, guest);
-      
+
       // Reset the form
       setNewGuest({ name: '', email: '' });
-      
+
       // Show success message
       setError('Guest added successfully!');
       setTimeout(() => setError(null), 3000);
@@ -140,15 +147,15 @@ const EventList = () => {
       const { data, error } = await supabase
         .from('events')
         .insert([
-          { 
-            name: newEvent.name.trim(),
+          {
+            event_name: newEvent.name.trim(),
             event_date: newEvent.event_date,
           },
         ])
         .select();
 
       if (error) throw error;
-      
+
       if (data && data[0]) {
         setEvents([data[0], ...events]);
         handleClose();
@@ -160,9 +167,9 @@ const EventList = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -176,9 +183,9 @@ const EventList = () => {
         <Typography variant="h2" component="h2">
           My Events
         </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
+        <Button
+          variant="contained"
+          color="primary"
           startIcon={<AddIcon />}
           onClick={handleOpen}
         >
@@ -202,58 +209,73 @@ const EventList = () => {
           </CardContent>
         </Card>
       ) : (
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, 
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
           gap: 3,
           alignItems: 'start'
         }}>
           {events.map((event) => (
-            <Card 
-              key={event.id} 
-              variant="outlined" 
+            <Card
+              key={event.id}
+              variant="outlined"
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 height: 'auto',
                 minHeight: '120px',
                 maxWidth: '100%',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 3,
+                },
               }}
             >
-              <CardContent sx={{ pb: 1 }}>
-                <Typography variant="h6" component="h3" gutterBottom>
-                  {event.name}
-                </Typography>
-                <Typography color="textSecondary" variant="body2">
-                  {formatDate(event.event_date)}
-                </Typography>
-              </CardContent>
+              <CardActionArea
+                component={Link}
+                to={`/events/${event.id}`}
+                sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+              >
+                <CardContent sx={{ pb: 1, width: '100%' }}>
+                  <Typography variant="h6" component="h3" gutterBottom>
+                    {event.name}
+                  </Typography>
+                  <Typography color="textSecondary" variant="body2">
+                    {formatDate(event.event_date)}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
               <Divider />
               <Box sx={{
                 p: 2,
                 pt: 1,
                 borderTop: '1px solid',
                 borderColor: 'divider',
-                mt: 'auto'
+                mt: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Guests
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mr: 1 }}>
+                    {guestsByEvent[event.id]?.length || 0} {guestsByEvent[event.id]?.length === 1 ? 'guest' : 'guests'}
                   </Typography>
-                  <IconButton 
-                    size="small" 
+                  <IconButton
+                    size="small"
                     color="primary"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       handleGuestDialogOpen(event);
                     }}
-                    sx={{ ml: 1 }}
                   >
                     <PersonAddIcon fontSize="small" />
                   </IconButton>
                 </Box>
-                
+
                 {loadingGuests ? (
                   <Box display="flex" justifyContent="center" py={1}>
                     <CircularProgress size={20} />
@@ -264,7 +286,7 @@ const EventList = () => {
                       <Box key={guest.id} display="flex" alignItems="center" mb={0.5}>
                         <PersonIcon fontSize="small" color="action" sx={{ mr: 1 }} />
                         <Typography variant="body2">
-                          {guest.name}
+                          {guest.display_name}
                           {guest.email && ` (${guest.email})`}
                         </Typography>
                       </Box>
@@ -282,7 +304,13 @@ const EventList = () => {
                 )}
               </Box>
               <CardActions sx={{ justifyContent: 'flex-end' }}>
-                <Button size="small" color="primary">
+                <Button
+                  size="small"
+                  color="primary"
+                  component={Link}
+                  to={`/events/${event.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   View Details
                 </Button>
               </CardActions>
@@ -310,15 +338,15 @@ const EventList = () => {
         </DialogTitle>
         <DialogContent>
           {error && (
-            <Alert 
-              severity={error.includes('success') ? 'success' : 'error'} 
+            <Alert
+              severity={error.includes('success') ? 'success' : 'error'}
               sx={{ mb: 2 }}
               onClose={() => setError(null)}
             >
               {error}
             </Alert>
           )}
-          
+
           {selectedEvent && guestsByEvent[selectedEvent.id]?.length > 0 && (
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle2" gutterBottom>
@@ -326,23 +354,23 @@ const EventList = () => {
               </Typography>
               <Box sx={{ maxHeight: 200, overflow: 'auto', mb: 2, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
                 {selectedEvent && guestsByEvent[selectedEvent.id]?.map(guest => (
-                  <Box 
-                    key={guest.id} 
-                    display="flex" 
-                    alignItems="center" 
-                    py={1} 
+                  <Box
+                    key={guest.id}
+                    display="flex"
+                    alignItems="center"
+                    py={1}
                     px={1}
-                    sx={{ 
-                      '&:not(:last-child)': { 
+                    sx={{
+                      '&:not(:last-child)': {
                         borderBottom: '1px solid',
                         borderColor: 'divider'
-                      } 
+                      }
                     }}
                   >
                     <PersonIcon fontSize="small" color="action" sx={{ mr: 1.5 }} />
                     <Box>
                       <Typography variant="body2">
-                        {guest.name}
+                        {guest.display_name}
                       </Typography>
                       {guest.email && (
                         <Typography variant="caption" color="text.secondary">
@@ -355,7 +383,7 @@ const EventList = () => {
               </Box>
             </Box>
           )}
-          
+
           <Box component="form" noValidate sx={{ mt: 1 }}>
             <Typography variant="subtitle2" gutterBottom>
               Add New Guest
@@ -391,9 +419,9 @@ const EventList = () => {
           <Button onClick={handleGuestDialogClose}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleAddGuest} 
-            variant="contained" 
+          <Button
+            onClick={handleAddGuest}
+            variant="contained"
             color="primary"
           >
             Add Guest
@@ -456,9 +484,9 @@ const EventList = () => {
           <Button onClick={handleClose}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleCreateEvent} 
-            variant="contained" 
+          <Button
+            onClick={handleCreateEvent}
+            variant="contained"
             color="primary"
           >
             Create Event
