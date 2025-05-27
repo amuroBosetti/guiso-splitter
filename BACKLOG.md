@@ -17,8 +17,8 @@ A simple, frictionless PWA for organizing and splitting expenses for group food 
 ## Epics & User Stories
 
 ### 1. Event Creation & Management
-- As a user, I want to create an event with a date and a list of guests, so we can plan gatherings together.
-- As a user, I want to propose a location and a meal for the event, so everyone knows where and what we’ll eat.
+- [x] As a user, I want to create an event with a date and a list of guests, so we can plan gatherings together.
+- [x] As a user, I want to propose a location and a meal for the event, so everyone knows where and what we’ll eat.
 - As a user, I want to list all ingredients needed for the meal, so we can organize who brings what.
 
 ### 2. Ingredient Assignment & Expense Tracking

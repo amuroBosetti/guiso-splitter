@@ -28,6 +28,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { supabase } from '../lib/supabase';
 import { GuestRepository } from '../repositories/GuestRepository';
 import { MealRepository, type Meal } from '../repositories/MealRepository';
+import { IngredientsList } from './IngredientsList';
 
 import type { Guest } from '../repositories/GuestRepository';
 
@@ -252,6 +253,11 @@ const EventDetail = () => {
                             Proposed by: {meal.user.display_name}
                           </Typography>
                         )}
+                        
+                        {/* Ingredients List */}
+                        <Box mt={1}>
+                          <IngredientsList mealId={meal.id} />
+                        </Box>
                       </Box>
                     }
                   />
