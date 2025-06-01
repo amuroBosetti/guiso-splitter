@@ -8,6 +8,11 @@ export interface Ingredient {
   created_at: string;
   updated_at: string;
   created_by: string;
+  assigned_to?: string;
+  assigned_user?: {
+    id: string;
+    display_name: string;
+  };
 }
 
 export interface CreateIngredientInput {
@@ -20,12 +25,26 @@ export class IngredientRepository {
   static async getIngredientsForMeal(mealId: string): Promise<Ingredient[]> {
     const { data, error } = await supabase
       .from('ingredients')
-      .select('*')
+      .select(`
+        *,
+        assigned_user:user_profiles!assigned_to (
+          id,
+          display_name
+        )
+      `)
       .eq('meal_id', mealId)
       .order('created_at', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    
+    // Transform the data to match the Ingredient interface
+    return (data?.map(ingredient => ({
+      ...ingredient,
+      assigned_user: ingredient.assigned_user ? {
+        id: ingredient.assigned_user.id,
+        display_name: ingredient.assigned_user.display_name
+      } : undefined
+    })) as Ingredient[]) || [];
   }
 
   static async createIngredient(ingredient: CreateIngredientInput): Promise<Ingredient> {
@@ -76,5 +95,57 @@ export class IngredientRepository {
       .eq('id', id);
 
     if (error) throw error;
+  }
+
+  static async assignIngredient(ingredientId: string, userId: string): Promise<Ingredient> {
+    const { data, error } = await supabase
+      .from('ingredients')
+      .update({ assigned_to: userId })
+      .eq('id', ingredientId)
+      .select(`
+        *,
+        assigned_user:user_profiles!assigned_to (
+          id,
+          display_name
+        )
+      `)
+      .single();
+
+    if (error) throw error;
+    
+    // Transform the data to match the Ingredient interface
+    return {
+      ...data,
+      assigned_user: data.assigned_user ? {
+        id: data.assigned_user.id,
+        display_name: data.assigned_user.display_name
+      } : undefined
+    } as Ingredient;
+  }
+
+  static async unassignIngredient(ingredientId: string): Promise<Ingredient> {
+    const { data, error } = await supabase
+      .from('ingredients')
+      .update({ assigned_to: null })
+      .eq('id', ingredientId)
+      .select(`
+        *,
+        assigned_user:user_profiles!assigned_to (
+          id,
+          display_name
+        )
+      `)
+      .single();
+
+    if (error) throw error;
+    
+    // Transform the data to match the Ingredient interface
+    return {
+      ...data,
+      assigned_user: data.assigned_user ? {
+        id: data.assigned_user.id,
+        display_name: data.assigned_user.display_name
+      } : undefined
+    } as Ingredient;
   }
 }

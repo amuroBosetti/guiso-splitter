@@ -101,13 +101,43 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
   const handleAssignConfirm = async () => {
     if (!selectedIngredient || !selectedGuestId) return;
     
-    // TODO: Implement ingredient assignment logic
-    console.log('Assigning ingredient', selectedIngredient.name, 'to guest', selectedGuestId);
-    
-    // Close dialog
-    setAssignDialogOpen(false);
-    setSelectedIngredient(null);
-    setSelectedGuestId('');
+    try {
+      setError(null);
+      const updatedIngredient = await IngredientRepository.assignIngredient(
+        selectedIngredient.id,
+        selectedGuestId
+      );
+      
+      // Update the ingredient in the local state
+      setIngredients(prev => 
+        prev.map(ing => 
+          ing.id === updatedIngredient.id ? updatedIngredient : ing
+        )
+      );
+      
+      // Close dialog
+      setAssignDialogOpen(false);
+      setSelectedIngredient(null);
+      setSelectedGuestId('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to assign ingredient');
+    }
+  };
+
+  const handleUnassignIngredient = async (ingredient: Ingredient) => {
+    try {
+      setError(null);
+      const updatedIngredient = await IngredientRepository.unassignIngredient(ingredient.id);
+      
+      // Update the ingredient in the local state
+      setIngredients(prev => 
+        prev.map(ing => 
+          ing.id === updatedIngredient.id ? updatedIngredient : ing
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to unassign ingredient');
+    }
   };
 
   const handleAssignCancel = () => {
@@ -188,9 +218,21 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
               >
                 <ListItemText 
                   primary={
-                    <Box display="flex" alignItems="center" gap={1}>
+                    <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} gap={1}>
                       <Typography>{ingredient.name}</Typography>
-                      {/* TODO: Show assigned guest chip here */}
+                      {ingredient.assigned_user && (
+                        <Chip
+                          label={ingredient.assigned_user.display_name}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                          onDelete={() => handleUnassignIngredient(ingredient)}
+                          sx={{ 
+                            fontSize: '0.75rem',
+                            alignSelf: { xs: 'flex-start', sm: 'center' }
+                          }}
+                        />
+                      )}
                     </Box>
                   }
                 />
@@ -216,6 +258,20 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
           Assign Ingredient: {selectedIngredient?.name}
         </DialogTitle>
         <DialogContent>
+          {selectedIngredient?.assigned_user && (
+            <Box mb={2} p={2} bgcolor="grey.100" borderRadius={1}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Currently assigned to:
+              </Typography>
+              <Chip
+                label={selectedIngredient.assigned_user.display_name}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+            </Box>
+          )}
+          
           <Box mt={2}>
             <FormControl fullWidth>
               <InputLabel>Select Guest</InputLabel>
@@ -236,6 +292,17 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={handleAssignCancel}>Cancel</Button>
+          {selectedIngredient?.assigned_user && (
+            <Button 
+              onClick={() => {
+                handleUnassignIngredient(selectedIngredient);
+                handleAssignCancel();
+              }}
+              color="warning"
+            >
+              Unassign
+            </Button>
+          )}
           <Button 
             onClick={handleAssignConfirm} 
             variant="contained" 
