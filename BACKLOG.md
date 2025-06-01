@@ -22,9 +22,9 @@ A simple, frictionless PWA for organizing and splitting expenses for group food 
 - [x] As a user, I want to list all ingredients needed for the meal, so we can organize who brings what.
 
 ### 2. Ingredient Assignment & Expense Tracking
-- As a user, I want to claim responsibility for bringing specific ingredients, so we can divide shopping duties.
-- As a user, I want to record how much I spent on ingredients, either individually or as a group of items, so expenses are tracked accurately.
-- As a user, I want to see a summary of who spent what, so we can split costs fairly.
+- [x] As a user, I want to claim responsibility for bringing specific ingredients, so we can divide shopping duties.
+- [x] As a user, I want to record how much I spent on ingredients, either individually or as a group of items, so expenses are tracked accurately.
+- [x] As a user, I want to see a summary of who spent what, so we can split costs fairly.
 
 ### 3. Dietary Preferences & Exclusions
 - As a user, I want to be excluded from certain categories of items (e.g., meat, alcohol), so my share reflects my dietary choices.
