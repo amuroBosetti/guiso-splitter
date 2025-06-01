@@ -49,6 +49,34 @@ export type Database = {
           updated_at?: string;
         };
       };
+      expenses: {
+        Row: {
+          id: string;
+          event_id: string;
+          amount: number;
+          recorded_by: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          amount: number;
+          recorded_by: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          amount?: number;
+          recorded_by?: string;
+          notes?: string | null;
+          updated_at?: string;
+        };
+      };
     };
   };
 };

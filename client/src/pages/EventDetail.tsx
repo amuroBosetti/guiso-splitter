@@ -19,23 +19,26 @@ import {
   ListItem,
   ListItemText,
   Chip,
-  Paper
+  Paper,
+  ListItemSecondaryAction
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { supabase } from '../lib/supabase';
 import { GuestRepository } from '../repositories/GuestRepository';
 import { MealRepository, type Meal } from '../repositories/MealRepository';
+import { ExpenseRepository, type Expense } from '../repositories/ExpenseRepository';
 import { IngredientsList } from '../components/IngredientsList';
 
 import type { Guest } from '../repositories/GuestRepository';
 
 interface Event {
   id: string;
-  name: string;
+  event_name: string;
   event_date: string;
   created_at: string;
 }
@@ -46,6 +49,7 @@ const EventDetail = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mealDialogOpen, setMealDialogOpen] = useState(false);
@@ -78,14 +82,16 @@ const EventDetail = () => {
         
         setEvent(eventData);
         
-        // Fetch guests and meals in parallel
-        const [guestsData, mealsData] = await Promise.all([
+        // Fetch guests, meals, and expenses in parallel
+        const [guestsData, mealsData, expensesData] = await Promise.all([
           GuestRepository.getGuestsForEvent(id),
-          MealRepository.getMealsForEvent(id)
+          MealRepository.getMealsForEvent(id),
+          ExpenseRepository.getExpensesForEvent(id)
         ]);
         
         setGuests(guestsData);
         setMeals(mealsData);
+        setExpenses(expensesData);
         
       } catch (err) {
         console.error('Error fetching event data:', err);
@@ -106,6 +112,13 @@ const EventDetail = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
   };
 
   const handleMealFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -216,6 +229,8 @@ const EventDetail = () => {
     );
   }
 
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
   return (
     <Box>
       <Box mb={3} display="flex" alignItems="center">
@@ -223,7 +238,7 @@ const EventDetail = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" component="h1">
-          {event.name}
+          {event.event_name}
         </Typography>
       </Box>
 
@@ -240,16 +255,33 @@ const EventDetail = () => {
               <Typography variant="body1">
                 <strong>Created:</strong> {new Date(event.created_at).toLocaleDateString()}
               </Typography>
+              {totalExpenses > 0 && (
+                <Typography variant="body1" sx={{ mt: 1 }}>
+                  <strong>Total Expenses:</strong> {formatCurrency(totalExpenses)}
+                </Typography>
+              )}
             </Box>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<RestaurantIcon />}
-              onClick={() => setMealDialogOpen(true)}
-              sx={{ mt: 1 }}
-            >
-              Propose Meal
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<RestaurantIcon />}
+                onClick={() => setMealDialogOpen(true)}
+              >
+                Propose Meal
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<AttachMoneyIcon />}
+                onClick={() => {
+                  // TODO: Implement split functionality
+                  console.log('Split expenses');
+                }}
+              >
+                Split
+              </Button>
+            </Box>
           </Box>
         </CardContent>
       </Card>
@@ -326,6 +358,64 @@ const EventDetail = () => {
               </Paper>
             ))}
           </List>
+        )}
+      </Box>
+
+      {/* Expenses Section */}
+      <Box mt={4}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6">
+            Expenses ({expenses.length})
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AttachMoneyIcon />}
+            onClick={() => navigate('/expenses')}
+          >
+            Add Expense
+          </Button>
+        </Box>
+        {expenses.length === 0 ? (
+          <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
+            No expenses have been recorded for this event yet.
+          </Typography>
+        ) : (
+          <Paper variant="outlined">
+            <List>
+              {expenses.map((expense, index) => (
+                <Box key={expense.id}>
+                  <ListItem>
+                    <ListItemText
+                      primary={
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="subtitle1">
+                            {formatCurrency(expense.amount)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {expense.user?.display_name || 'Unknown User'}
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Box sx={{ mt: 0.5 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {new Date(expense.created_at).toLocaleDateString()}
+                          </Typography>
+                          {expense.notes && (
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                              {expense.notes}
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  {index < expenses.length - 1 && <Divider />}
+                </Box>
+              ))}
+            </List>
+          </Paper>
         )}
       </Box>
 

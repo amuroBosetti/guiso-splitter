@@ -1,10 +1,11 @@
-import { CssBaseline, ThemeProvider, createTheme, Container, Typography, Box, AppBar, Toolbar, Button, Avatar } from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme, Container, Typography, Box, AppBar, Toolbar, Button, Avatar, Tabs, Tab } from '@mui/material';
 import { teal, deepOrange } from '@mui/material/colors';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import EventList from './pages/EventList';
 import EventDetail from './pages/EventDetail';
+import ExpenseTracker from './pages/ExpenseTracker';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Profile } from './pages/Profile';
@@ -49,6 +50,13 @@ const theme = createTheme({
 
 function Layout() {
   const { user, profile, signOut } = useAuth();
+  const location = useLocation();
+  
+  // Determine current tab based on location
+  const getCurrentTab = () => {
+    if (location.pathname.startsWith('/expenses')) return 1;
+    return 0; // Default to events tab
+  };
 
   return (
     <Box
@@ -110,6 +118,36 @@ function Layout() {
           </Toolbar>
         </Container>
       </AppBar>
+      
+      {/* Navigation Tabs - Only show when user is logged in and not on auth/profile pages */}
+      {user && !location.pathname.includes('/login') && !location.pathname.includes('/signup') && !location.pathname.includes('/profile') && (
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+          <Container maxWidth="lg">
+            <Tabs 
+              value={getCurrentTab()} 
+              sx={{ 
+                '& .MuiTabs-indicator': { 
+                  backgroundColor: 'primary.main' 
+                } 
+              }}
+            >
+              <Tab 
+                label="Events" 
+                component={Link} 
+                to="/" 
+                sx={{ textTransform: 'none', fontWeight: 500 }}
+              />
+              <Tab 
+                label="Expense Tracker" 
+                component={Link} 
+                to="/expenses" 
+                sx={{ textTransform: 'none', fontWeight: 500 }}
+              />
+            </Tabs>
+          </Container>
+        </Box>
+      )}
+      
       <Container maxWidth="lg" sx={{ py: 4, flex: 1 }}>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -127,6 +165,11 @@ function Layout() {
           <Route path="/events/:id" element={
             <ProtectedRoute>
               <EventDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="/expenses" element={
+            <ProtectedRoute>
+              <ExpenseTracker />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/" />} />
