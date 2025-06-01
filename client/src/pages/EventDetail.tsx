@@ -25,10 +25,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { supabase } from '../lib/supabase';
 import { GuestRepository } from '../repositories/GuestRepository';
 import { MealRepository, type Meal } from '../repositories/MealRepository';
-import { IngredientsList } from './IngredientsList';
+import { IngredientsList } from '../components/IngredientsList';
 
 import type { Guest } from '../repositories/GuestRepository';
 
@@ -54,6 +55,9 @@ const EventDetail = () => {
   });
   const [mealError, setMealError] = useState<string | null>(null);
   const [submittingMeal, setSubmittingMeal] = useState(false);
+  const [deletingMealId, setDeletingMealId] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [mealToDelete, setMealToDelete] = useState<Meal | null>(null);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -156,6 +160,41 @@ const EventDetail = () => {
     }
   };
 
+  const handleDeleteMeal = async (mealId: string) => {
+    const meal = meals.find(m => m.id === mealId);
+    if (meal) {
+      setMealToDelete(meal);
+      setDeleteConfirmOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!mealToDelete) return;
+    
+    try {
+      setDeletingMealId(mealToDelete.id);
+      setMealError(null);
+      
+      await MealRepository.deleteMeal(mealToDelete.id);
+      
+      // Remove the meal from the local state
+      setMeals(prev => prev.filter(meal => meal.id !== mealToDelete.id));
+      
+    } catch (err) {
+      console.error('Error deleting meal:', err);
+      setMealError(err instanceof Error ? err.message : 'Failed to delete meal');
+    } finally {
+      setDeletingMealId(null);
+      setDeleteConfirmOpen(false);
+      setMealToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmOpen(false);
+    setMealToDelete(null);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" my={4}>
@@ -220,6 +259,11 @@ const EventDetail = () => {
         <Typography variant="h6" gutterBottom>
           Proposed Meals
         </Typography>
+        {mealError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {mealError}
+          </Alert>
+        )}
         {meals.length === 0 ? (
           <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
             No meals have been proposed yet. Be the first to suggest one!
@@ -231,16 +275,33 @@ const EventDetail = () => {
                 <ListItem>
                   <ListItemText
                     primary={
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Typography variant="subtitle1">{meal.meal_name}</Typography>
-                        <Chip 
-                          label={meal.status} 
-                          size="small" 
-                          color={
-                            meal.status === 'accepted' ? 'success' : 
-                            meal.status === 'rejected' ? 'error' : 'default'
-                          }
-                        />
+                      <Box display="flex" alignItems="center" gap={1} justifyContent="space-between">
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography variant="subtitle1">{meal.meal_name}</Typography>
+                          <Chip 
+                            label={meal.status} 
+                            size="small" 
+                            color={
+                              meal.status === 'accepted' ? 'success' : 
+                              meal.status === 'rejected' ? 'error' : 'default'
+                            }
+                          />
+                        </Box>
+                        {meal.status === 'proposed' && (
+                          <IconButton
+                            aria-label="delete"
+                            onClick={() => handleDeleteMeal(meal.id)}
+                            disabled={deletingMealId === meal.id}
+                            color="error"
+                            size="small"
+                          >
+                            {deletingMealId === meal.id ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <DeleteIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        )}
                       </Box>
                     }
                     secondary={
@@ -256,7 +317,7 @@ const EventDetail = () => {
                         
                         {/* Ingredients List */}
                         <Box mt={1}>
-                          <IngredientsList mealId={meal.id} />
+                          <IngredientsList mealId={meal.id} guests={guests} />
                         </Box>
                       </Box>
                     }
@@ -311,6 +372,28 @@ const EventDetail = () => {
             disabled={!mealForm.name.trim() || submittingMeal}
           >
             {submittingMeal ? 'Submitting...' : 'Propose Meal'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={handleCancelDelete} maxWidth="sm" fullWidth>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete the meal "{mealToDelete?.meal_name}"? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button 
+            onClick={handleConfirmDelete} 
+            variant="contained" 
+            color="error"
+            startIcon={<DeleteIcon />}
+            disabled={deletingMealId === mealToDelete?.id}
+          >
+            {deletingMealId === mealToDelete?.id ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>

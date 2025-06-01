@@ -29,21 +29,21 @@ export type Database = {
       events: {
         Row: {
           id: string;
-          name: string;
+          event_name: string;
           event_date: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
-          name: string;
+          event_name: string;
           event_date: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
-          name?: string;
+          event_name?: string;
           event_date?: string;
           created_at?: string;
           updated_at?: string;

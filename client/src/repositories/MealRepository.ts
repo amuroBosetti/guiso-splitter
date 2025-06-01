@@ -50,4 +50,38 @@ export class MealRepository {
       } : undefined
     })) as Meal[]) || [];
   }
+
+  static async deleteMeal(mealId: string): Promise<void> {
+    console.log('Attempting to delete meal: ',mealId);
+    
+    // Get the current session to include the auth token
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.access_token) {
+      throw new Error('No authentication token available');
+    }
+
+    console.log('Session info:', {
+      userId: session.user?.id,
+      hasToken: !!session.access_token,
+      tokenLength: session.access_token.length
+    });
+
+    const { data, error } = await supabase.functions.invoke('delete-meal', {
+      body: { mealId },
+    });
+
+    console.log('Delete response:', { data, error });
+    console.log('Response data details:', data);
+
+    if (error) {
+      console.error('Edge function error:', error);
+      throw new Error(error.message || 'Failed to delete meal');
+    }
+
+    if (data?.error) {
+      console.error('Business logic error:', data.error);
+      throw new Error(data.error);
+    }
+  }
 }

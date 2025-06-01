@@ -240,7 +240,7 @@ const EventList = () => {
               >
                 <CardContent sx={{ pb: 1, width: '100%' }}>
                   <Typography variant="h6" component="h3" gutterBottom>
-                    {event.name}
+                    {event.event_name}
                   </Typography>
                   <Typography color="textSecondary" variant="body2">
                     {formatDate(event.event_date)}
@@ -322,7 +322,7 @@ const EventList = () => {
       {/* Add Guest Dialog */}
       <Dialog open={guestDialogOpen} onClose={handleGuestDialogClose} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Add Guest to {selectedEvent?.name}
+          Add Guest to {selectedEvent?.event_name}
           <IconButton
             aria-label="close"
             onClick={handleGuestDialogClose}

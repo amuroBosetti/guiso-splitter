@@ -11,19 +11,38 @@ import {
   Paper, 
   Typography,
   Divider,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Chip
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, PersonAdd } from '@mui/icons-material';
+
+interface Guest {
+  id: string;
+  display_name: string;
+  email: string | null;
+}
 
 interface IngredientsListProps {
   mealId: string;
+  guests: Guest[];
 }
 
-export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId }) => {
+export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests }) => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [newIngredient, setNewIngredient] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+  const [selectedGuestId, setSelectedGuestId] = useState('');
 
   // Load ingredients when component mounts or mealId changes
   useEffect(() => {
@@ -62,7 +81,6 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId }) => {
   };
 
   const handleDeleteIngredient = async (id: string) => {
-    
     try {
       setLoading(true);
       await IngredientRepository.deleteIngredient(id);
@@ -74,6 +92,30 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId }) => {
     }
   };
 
+  const handleAssignClick = (ingredient: Ingredient) => {
+    setSelectedIngredient(ingredient);
+    setSelectedGuestId('');
+    setAssignDialogOpen(true);
+  };
+
+  const handleAssignConfirm = async () => {
+    if (!selectedIngredient || !selectedGuestId) return;
+    
+    // TODO: Implement ingredient assignment logic
+    console.log('Assigning ingredient', selectedIngredient.name, 'to guest', selectedGuestId);
+    
+    // Close dialog
+    setAssignDialogOpen(false);
+    setSelectedIngredient(null);
+    setSelectedGuestId('');
+  };
+
+  const handleAssignCancel = () => {
+    setAssignDialogOpen(false);
+    setSelectedIngredient(null);
+    setSelectedGuestId('');
+  };
+
   if (loading && ingredients.length === 0) {
     return (
       <Box display="flex" justifyContent="center" p={2}>
@@ -83,69 +125,127 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId }) => {
   }
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Typography variant="h6">Ingredients</Typography>
-      </Box>
-      
-      <Box display="flex" gap={1} mb={2}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Add an ingredient..."
-          value={newIngredient}
-          onChange={(e) => setNewIngredient(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleAddIngredient()}
-          disabled={loading}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddIngredient}
-          disabled={!newIngredient.trim() || loading}
-          startIcon={<Add />}
-        >
-          Add
-        </Button>
-      </Box>
-
-      {error && (
-        <Typography color="error" variant="body2" mb={2}>
-          {error}
-        </Typography>
-      )}
-
-      <List dense>
-        {ingredients.map((ingredient) => (
-          <Fragment key={ingredient.id}>
-            <ListItem
-              secondaryAction={
-                <IconButton 
-                  edge="end" 
-                  aria-label="delete"
-                  onClick={() => handleDeleteIngredient(ingredient.id)}
-                  disabled={loading}
-                  size="small"
-                >
-                  <Delete fontSize="small" />
-                </IconButton>
-              }
-            >
-              <ListItemText primary={ingredient.name} />
-            </ListItem>
-            <Divider component="li" />
-          </Fragment>
-        ))}
+    <>
+      <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Typography variant="h6">Ingredients</Typography>
+        </Box>
         
-        {ingredients.length === 0 && (
-          <ListItem>
-            <ListItemText 
-              primary="No ingredients added yet" 
-              primaryTypographyProps={{ color: 'textSecondary', fontStyle: 'italic' }}
-            />
-          </ListItem>
+        <Box display="flex" gap={1} mb={2}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Add an ingredient..."
+            value={newIngredient}
+            onChange={(e) => setNewIngredient(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAddIngredient()}
+            disabled={loading}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddIngredient}
+            disabled={!newIngredient.trim() || loading}
+            startIcon={<Add />}
+          >
+            Add
+          </Button>
+        </Box>
+
+        {error && (
+          <Typography color="error" variant="body2" mb={2}>
+            {error}
+          </Typography>
         )}
-      </List>
-    </Paper>
+
+        <List dense>
+          {ingredients.map((ingredient) => (
+            <Fragment key={ingredient.id}>
+              <ListItem
+                secondaryAction={
+                  <Box display="flex" gap={1}>
+                    <IconButton 
+                      edge="end" 
+                      aria-label="assign"
+                      onClick={() => handleAssignClick(ingredient)}
+                      disabled={loading}
+                      size="small"
+                      color="primary"
+                    >
+                      <PersonAdd fontSize="small" />
+                    </IconButton>
+                    <IconButton 
+                      edge="end" 
+                      aria-label="delete"
+                      onClick={() => handleDeleteIngredient(ingredient.id)}
+                      disabled={loading}
+                      size="small"
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </Box>
+                }
+              >
+                <ListItemText 
+                  primary={
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography>{ingredient.name}</Typography>
+                      {/* TODO: Show assigned guest chip here */}
+                    </Box>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+            </Fragment>
+          ))}
+          
+          {ingredients.length === 0 && (
+            <ListItem>
+              <ListItemText 
+                primary="No ingredients added yet" 
+                primaryTypographyProps={{ color: 'textSecondary', fontStyle: 'italic' }}
+              />
+            </ListItem>
+          )}
+        </List>
+      </Paper>
+
+      {/* Assignment Dialog */}
+      <Dialog open={assignDialogOpen} onClose={handleAssignCancel} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Assign Ingredient: {selectedIngredient?.name}
+        </DialogTitle>
+        <DialogContent>
+          <Box mt={2}>
+            <FormControl fullWidth>
+              <InputLabel>Select Guest</InputLabel>
+              <Select
+                value={selectedGuestId}
+                label="Select Guest"
+                onChange={(e) => setSelectedGuestId(e.target.value)}
+              >
+                {guests.map((guest) => (
+                  <MenuItem key={guest.id} value={guest.id}>
+                    {guest.display_name}
+                    {guest.email && ` (${guest.email})`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={handleAssignCancel}>Cancel</Button>
+          <Button 
+            onClick={handleAssignConfirm} 
+            variant="contained" 
+            color="primary"
+            disabled={!selectedGuestId}
+          >
+            Assign
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
