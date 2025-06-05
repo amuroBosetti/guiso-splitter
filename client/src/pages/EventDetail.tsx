@@ -208,6 +208,11 @@ const EventDetail = () => {
     setMealToDelete(null);
   };
 
+  const handleSplit = () => {
+    if (!id) return;
+    navigate(`/split-results?eventId=${id}`);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" my={4}>
@@ -274,10 +279,8 @@ const EventDetail = () => {
                 variant="outlined"
                 color="primary"
                 startIcon={<AttachMoneyIcon />}
-                onClick={() => {
-                  // TODO: Implement split functionality
-                  console.log('Split expenses');
-                }}
+                onClick={handleSplit}
+                disabled={expenses.length === 0}
               >
                 Split
               </Button>

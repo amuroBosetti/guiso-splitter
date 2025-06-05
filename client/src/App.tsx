@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import EventList from './pages/EventList';
 import EventDetail from './pages/EventDetail';
 import ExpenseTracker from './pages/ExpenseTracker';
+import SplitResults from './pages/SplitResults';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Profile } from './pages/Profile';
@@ -170,6 +171,11 @@ function Layout() {
           <Route path="/expenses" element={
             <ProtectedRoute>
               <ExpenseTracker />
+            </ProtectedRoute>
+          } />
+          <Route path="/split-results" element={
+            <ProtectedRoute>
+              <SplitResults />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/" />} />
