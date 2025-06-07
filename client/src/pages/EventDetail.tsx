@@ -19,8 +19,7 @@ import {
   ListItem,
   ListItemText,
   Chip,
-  Paper,
-  ListItemSecondaryAction
+  Paper
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';

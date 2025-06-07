@@ -22,8 +22,7 @@ import {
   Add as AddIcon,
   PersonAdd as PersonAddIcon,
   Close as CloseIcon,
-  Person as PersonIcon,
-  ArrowForward as ArrowForwardIcon
+  Person as PersonIcon
 } from '@mui/icons-material';
 import { supabase } from '../lib/supabase';
 import { GuestRepository, type Guest } from '../repositories/GuestRepository';
