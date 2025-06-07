@@ -1,0 +1,19 @@
+{
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2",
+    "std/": "https://deno.land/std@0.168.0/",
+    "asserts": "https://deno.land/std@0.168.0/testing/asserts.ts"
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "es2022"],
+    "types": []
+  },
+  "nodeModulesDir": "auto",
+  "test": {
+    "include": ["**/*.test.ts"]
+  },
+  "tasks": {
+    "test": "deno test --allow-all",
+    "test-watch": "deno test --allow-all --watch"
+  }
+} 
