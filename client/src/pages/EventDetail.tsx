@@ -350,7 +350,7 @@ const EventDetail = () => {
                           </Typography>
                         )}
                         
-                        {/* Ingredients List */}
+                        {/* Groceries List */}
                         <Box mt={1}>
                           <IngredientsList mealId={meal.id} guests={guests} />
                         </Box>

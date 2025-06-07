@@ -158,14 +158,14 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
     <>
       <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Typography variant="h6">Ingredients</Typography>
+          <Typography variant="h6">Groceries</Typography>
         </Box>
         
         <Box display="flex" gap={1} mb={2}>
           <TextField
             fullWidth
             size="small"
-            placeholder="Add an ingredient..."
+            placeholder="Add a grocery item..."
             value={newIngredient}
             onChange={(e) => setNewIngredient(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleAddIngredient()}
@@ -244,7 +244,7 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
           {ingredients.length === 0 && (
             <ListItem>
               <ListItemText 
-                primary="No ingredients added yet" 
+                primary="No groceries added yet" 
                 primaryTypographyProps={{ color: 'textSecondary', fontStyle: 'italic' }}
               />
             </ListItem>
@@ -255,7 +255,7 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({ mealId, guests
       {/* Assignment Dialog */}
       <Dialog open={assignDialogOpen} onClose={handleAssignCancel} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Assign Ingredient: {selectedIngredient?.name}
+          Assign Grocery: {selectedIngredient?.name}
         </DialogTitle>
         <DialogContent>
           {selectedIngredient?.assigned_user && (
