@@ -1,5 +1,10 @@
 // Pure calculation functions that can be tested independently
 
+// Utility function for rounding half up to 2 decimal places using toFixed
+function roundHalfUp(value: number): number {
+  return parseFloat(value.toFixed(2));
+}
+
 export interface Expense {
   id: string;
   amount: number;
@@ -44,9 +49,15 @@ export function calculateDebts(balances: { [userId: string]: { name: string; bal
   const debts: { [userId: string]: Array<{ to_user: string; amount: number }> } = {};
   const credits: { [userId: string]: Array<{ from_user: string; amount: number }> } = {};
   
+  // Create a deep copy of balances to avoid modifying the original
+  const balancesCopy: { [userId: string]: { name: string; balance: number } } = {};
+  Object.entries(balances).forEach(([userId, data]) => {
+    balancesCopy[userId] = { name: data.name, balance: data.balance };
+  });
+  
   // Separate creditors (positive balance) and debtors (negative balance)
-  const creditors = Object.entries(balances).filter(([_, data]) => data.balance > 0);
-  const debtors = Object.entries(balances).filter(([_, data]) => data.balance < 0);
+  const creditors = Object.entries(balancesCopy).filter(([_, data]) => data.balance > 0);
+  const debtors = Object.entries(balancesCopy).filter(([_, data]) => data.balance < 0);
   
   // Sort by amount (largest first)
   creditors.sort((a, b) => b[1].balance - a[1].balance);
@@ -69,15 +80,15 @@ export function calculateDebts(balances: { [userId: string]: { name: string; bal
     
     debts[debtorId].push({
       to_user: creditorData.name,
-      amount: Math.round(transferAmount * 100) / 100
+      amount: roundHalfUp(transferAmount)
     });
     
     credits[creditorId].push({
       from_user: debtorData.name,
-      amount: Math.round(transferAmount * 100) / 100
+      amount: roundHalfUp(transferAmount)
     });
     
-    // Update balances
+    // Update balances (working on the copy)
     creditorData.balance -= transferAmount;
     debtorData.balance += transferAmount;
     
@@ -135,7 +146,8 @@ export function calculateSplit(expenses: Expense[], guests: Guest[]): {
     throw new Error('No participants found');
   }
   
-  const sharePerPerson = totalExpenses / participants.length;
+  // Round the share per person using round half up
+  const sharePerPerson = roundHalfUp(totalExpenses / participants.length);
 
   // Calculate balances for each participant
   const balances: { [userId: string]: { name: string; balance: number } } = {};
@@ -144,7 +156,7 @@ export function calculateSplit(expenses: Expense[], guests: Guest[]): {
     const balance = participant.totalSpent - sharePerPerson;
     balances[participant.id] = {
       name: participant.name,
-      balance: Math.round(balance * 100) / 100
+      balance: roundHalfUp(balance)
     };
   });
 
@@ -158,8 +170,8 @@ export function calculateSplit(expenses: Expense[], guests: Guest[]): {
     return {
       user_name: participant.name,
       user_id: participant.id,
-      total_spent: Math.round(participant.totalSpent * 100) / 100,
-      share_amount: Math.round(sharePerPerson * 100) / 100,
+      total_spent: roundHalfUp(participant.totalSpent),
+      share_amount: sharePerPerson,
       balance: balance,
       owes: debts[participant.id] || undefined,
       owed: credits[participant.id] || undefined
@@ -168,8 +180,8 @@ export function calculateSplit(expenses: Expense[], guests: Guest[]): {
 
   return {
     participants,
-    totalExpenses: Math.round(totalExpenses * 100) / 100,
-    sharePerPerson: Math.round(sharePerPerson * 100) / 100,
+    totalExpenses: roundHalfUp(totalExpenses),
+    sharePerPerson: sharePerPerson,
     results
   };
 } 
