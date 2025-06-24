@@ -20,8 +20,8 @@ Your task:
 4. Consider variations and optional ingredients that might be used
 5. Return the ingredients as a structured response
 
-Respect the original language of the recipe name. If the recipe name is in English, return the ingredients in English. If the recipe name is in another language, return the ingredients in that language, and if 
-that language is Spanish, return the units in metric system
+Respect the original language of the recipe name. If the recipe name is in English, return the ingredients in English. If the recipe name is in another language, return the ingredients in that language.
+If the recipe name language is Spanish, return the units in metric system
 
 Be practical - include ingredients that would commonly be found in most versions of the recipe.
 
@@ -38,17 +38,20 @@ Output: ["spaghetti", "eggs (2)", "parmesan", "pepper", "salt"]
     ]
 )
 
+# Initialize the LLM with explicit configuration
 llm = HuggingFaceEndpoint(
     model="meta-llama/Llama-3.1-8B-Instruct",
     task="text-generation",
     max_new_tokens=512,
     do_sample=False,
     repetition_penalty=1.03,
+    verbose=False,  # Explicitly set verbose to False
 )
 
 model = ChatHuggingFace(
     llm=llm,
-    verbose=True,
+    verbose=False,  # Explicitly set verbose to False
+    debug=False
 )
 
 graph = create_react_agent(

@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 langgraph-cli = {extras = ["inmem"], version = "*"}
 langchain-huggingface = "*"
+langchain-core = "*"
+langchain = "*"
 text-generation = "*"
 transformers = "*"
 google-search-results = "*"
@@ -15,6 +17,10 @@ sentencepiece = "*"
 jinja2 = "*"
 bitsandbytes = "*"
 accelerate = "*"
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+langserve = "*"
+agent = {editable = true, path = "./langchain"}
 
 [dev-packages]
 
