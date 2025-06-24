@@ -18,8 +18,19 @@ A simple, frictionless PWA for organizing and splitting expenses for group food 
 
 ### 1. Event Creation & Management
 - [x] As a user, I want to create an event with a date and a list of guests, so we can plan gatherings together.
-- [x] As a user, I want to propose a location and a meal for the event, so everyone knows where and what we’ll eat.
+- [x] As a user, I want to propose a location and a meal for the event, so everyone knows where and what we'll eat.
 - [x] As a user, I want to list all ingredients needed for the meal, so we can organize who brings what.
+
+### 1.5. AI-Powered Meal Planning
+- [ ] **As a user, I want to create a meal by providing a description or name, so I can get AI-powered ingredient suggestions.**
+  - **Details**: User enters meal name/description (e.g., "Italian pasta night", "BBQ for 8 people", "vegetarian lasagna")
+  - **AI Integration**: System uses AI to generate comprehensive ingredient list with quantities
+  - **Context Awareness**: AI considers group size, dietary restrictions, and past meal data
+  - **Effort**: High (requires AI backend integration)
+- [ ] **As a user, I want to review and customize AI-generated ingredient lists, so I can adjust recommendations to my preferences.**
+  - **Details**: Edit, add, or remove suggested ingredients and quantities
+  - **Smart Suggestions**: AI provides alternatives for dietary restrictions or ingredient substitutions
+  - **Effort**: Medium
 
 ### 2. Ingredient Assignment & Expense Tracking
 - [x] As a user, I want to claim responsibility for bringing specific ingredients, so we can divide shopping duties.

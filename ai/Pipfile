@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = false
+name = "pypi"
+
+[packages]
+langgraph-cli = {extras = ["inmem"], version = "*"}
+langchain-huggingface = "*"
+text-generation = "*"
+transformers = "*"
+google-search-results = "*"
+numexpr = "*"
+langchainhub = "*"
+sentencepiece = "*"
+jinja2 = "*"
+bitsandbytes = "*"
+accelerate = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
