@@ -6,21 +6,6 @@ from langchain_core.runnables import RunnableConfig
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_core.prompts import ChatPromptTemplate
 
-class IngredientsListResponse(TypedDict):
-    ingredients: List[str]
-
-# Schema for response_format
-ingredients_schema = {
-    "type": "object",
-    "properties": {
-        "ingredients": {
-            "type": "array",
-            "items": {"type": "string"}
-        }
-    },
-    "required": ["ingredients"]
-}
-
 # Define a ReAct-compatible prompt template for generating ingredients from recipe names
 prompt = ChatPromptTemplate.from_messages(
     [
