@@ -32,6 +32,7 @@ import { GuestRepository } from '../repositories/GuestRepository';
 import { MealRepository, type Meal } from '../repositories/MealRepository';
 import { ExpenseRepository, type Expense } from '../repositories/ExpenseRepository';
 import { IngredientsList } from '../components/IngredientsList';
+import { IngredientRepository } from '../repositories/IngredientRepository';
 
 import type { Guest } from '../repositories/GuestRepository';
 
@@ -153,12 +154,36 @@ const EventDetail = () => {
         throw new Error('User profile not found. Please complete your profile first.');
       }
       
+      // 1. Create the meal first
       const newMeal = await MealRepository.proposeMeal({
         event_id: id,
         meal_name: mealForm.name.trim(),
         description: mealForm.description.trim(),
         proposed_by: userProfile.id
       });
+
+      // 2. Get ingredients from AI
+      const res = await fetch('http://localhost:8000/recipes/ingredients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipe_name: mealForm.name.trim() })
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to get ingredients suggestions');
+      }
+
+      const { ingredients }: { ingredients: string[] } = await res.json();
+
+      // 3. Create all ingredients
+      await Promise.all(
+        ingredients.map(ingredient =>
+          IngredientRepository.createIngredient({
+            meal_id: newMeal.id,
+            name: ingredient
+          })
+        )
+      );
       
       setMeals(prev => [newMeal, ...prev]);
       setMealForm({ name: '', description: '' });
