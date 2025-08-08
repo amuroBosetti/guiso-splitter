@@ -20,7 +20,8 @@ accelerate = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 langserve = "*"
-agent = {editable = true, path = "./langchain"}
+langsmith = "*"
+openevals = "*"
 
 [dev-packages]
 

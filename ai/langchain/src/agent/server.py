@@ -4,8 +4,11 @@ from langserve import add_routes
 from pydantic import BaseModel
 from typing import List
 import ast
+from dotenv import load_dotenv
+from pathlib import Path
 
 from agent.graph import graph
+
 
 # ---------------------------------------------------------------------------
 # Request/Response Models
@@ -19,6 +22,7 @@ class RecipeResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # FastAPI application setup
 # ---------------------------------------------------------------------------
+load_dotenv(Path(__file__).resolve().parents[2] / '.env')
 app = FastAPI(title="Guiso-Splitter Agent API", version="0.1.0")
 
 # Allow the Vite dev server (default port 5173) to call the API from the browser

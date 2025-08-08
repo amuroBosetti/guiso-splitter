@@ -51,9 +51,18 @@ llm = HuggingFaceEndpoint(
 model = ChatHuggingFace(
     llm=llm,
     verbose=False,  # Explicitly set verbose to False
-    debug=False
+    debug=True
 )
 
-graph = create_react_agent(
-    model=model, prompt=prompt, tools=[]
-)
+from langsmith import traceable
+
+@traceable(name="guiso-splitter-agent")
+def create_agent():
+    return create_react_agent(
+        model=model,
+        prompt=prompt,
+        tools=[],
+        name='guiso-splitter-agent'
+    )
+
+graph = create_agent()
