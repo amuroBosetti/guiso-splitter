@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5724f4148e75cd3063015737cf6f705668f8d1ee86ec82056de3fe915116612e"
+            "sha256": "273836726959908e699aa132aa70132ba8adc61ea4a20a15bf092f46b98f4ba0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -24,10 +24,6 @@
             "index": "pypi",
             "markers": "python_full_version >= '3.9.0'",
             "version": "==1.8.1"
-        },
-        "agent": {
-            "editable": true,
-            "path": "./langchain"
         },
         "aiohappyeyeballs": {
             "hashes": [
@@ -258,6 +254,14 @@
             "markers": "python_version >= '3.8'",
             "version": "==1.17.1"
         },
+        "cfgv": {
+            "hashes": [
+                "sha256:b7265b1f29fd3316bfcd2b330d63d024f2bfd8bcb8b0272f8e19a504856c48f9",
+                "sha256:e52591d4c5f5dead8e0f673fb16db7949d2cfb3f7da4582893288f0ded8fe560"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==3.4.0"
+        },
         "charset-normalizer": {
             "hashes": [
                 "sha256:005fa3432484527f9732ebd315da8da8001593e2cf46a3d817669f062c3d9ed4",
@@ -414,6 +418,13 @@
             ],
             "markers": "python_version >= '3.7' and python_full_version not in '3.9.0, 3.9.1'",
             "version": "==44.0.3"
+        },
+        "distlib": {
+            "hashes": [
+                "sha256:9659f7d87e46584a30b5780e43ac7a2143098441670ff0a49d5f9034c54a6c16",
+                "sha256:feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f401a4e0d"
+            ],
+            "version": "==0.4.0"
         },
         "distro": {
             "hashes": [
@@ -667,6 +678,14 @@
             ],
             "markers": "python_full_version >= '3.8.0'",
             "version": "==0.34.3"
+        },
+        "identify": {
+            "hashes": [
+                "sha256:ad9672d5a72e0d2ff7c5c8809b62dfa60458626352fb0eb7b55e69bdc45334a2",
+                "sha256:d8de45749f1efb108badef65ee8386f0f7bb19a7f26185f74de6367bffbaf0e6"
+            ],
+            "markers": "python_version >= '3.9'",
+            "version": "==2.6.12"
         },
         "idna": {
             "hashes": [
@@ -1164,6 +1183,14 @@
             "markers": "python_version >= '3.11'",
             "version": "==3.5"
         },
+        "nodeenv": {
+            "hashes": [
+                "sha256:6ec12890a2dab7946721edbfbcd91f3319c6ccc9aec47be7c7e6b7011ee6645f",
+                "sha256:ba11c9782d29c27c70ffbdda2d7415098754709be8a7056d79a737cd901155c9"
+            ],
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
+            "version": "==1.9.1"
+        },
         "numexpr": {
             "hashes": [
                 "sha256:096ec768bee2ef14ac757b4178e3c5f05e5f1cb6cae83b2eea9b4ba3ec1a86dd",
@@ -1419,6 +1446,23 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==24.2"
+        },
+        "platformdirs": {
+            "hashes": [
+                "sha256:3d512d96e16bcb959a814c9f348431070822a6496326a4be0911c40b5a74c2bc",
+                "sha256:ff7059bb7eb1179e2685604f4aaf157cfd9535242bd23742eadc3c13542139b4"
+            ],
+            "markers": "python_version >= '3.9'",
+            "version": "==4.3.8"
+        },
+        "pre-commit": {
+            "hashes": [
+                "sha256:601283b9757afd87d40c4c4a9b2b5de9637a8ea02eaff7adc2d0fb4e04841146",
+                "sha256:a009ca7205f1eb497d10b845e52c838a98b6cdd2102a6c8e4540e94ee75c58bd"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==4.2.0"
         },
         "propcache": {
             "hashes": [
@@ -2226,6 +2270,14 @@
             ],
             "markers": "python_full_version >= '3.8.0'",
             "version": "==0.21.0"
+        },
+        "virtualenv": {
+            "hashes": [
+                "sha256:07c19bc66c11acab6a5958b815cbcee30891cd1c2ccf53785a28651a0d8d8a67",
+                "sha256:1b44478d9e261b3fb8baa5e74a0ca3bc0e05f21aa36167bf9cbf850e542765b8"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==20.33.1"
         },
         "watchfiles": {
             "hashes": [
