@@ -14,11 +14,23 @@ dependencies = [
     "fastapi>=0.111.0",
     "uvicorn[standard]>=0.30.1",
     "langserve>=0.0.46",
+    # Required by src/agent/graph.py
+    "langchain-huggingface>=0.1",
 ]
 
 
 [project.optional-dependencies]
 dev = ["mypy>=1.11.1", "ruff>=0.6.1"]
+eval = [
+    # Evaluator and tracing deps
+    "langchain>=0.2",
+    "langchain-core>=0.2",
+    "langsmith>=0.1",
+    "openevals>=0.1",
+    # Providers used by evaluators/graph
+    "langchain-openai>=0.1",
+    "aiohttp>=3",
+]
 
 [build-system]
 requires = ["setuptools>=73.0.0", "wheel"]

@@ -1,6 +1,9 @@
 name: Run LangSmith Eval
 
 on:
+  push:
+    paths:
+      - 'ai/langchain/**'
   workflow_dispatch:
     inputs:
       dataset:
@@ -28,19 +31,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Install the LangGraph agent package in editable mode
-          pip install -e ai/langchain
-          # Install eval-time dependencies used by evaluators and runner
-          pip install "langchain>=0.2" "langchain-core>=0.2" "langchain-huggingface>=0.1" langsmith openevals python-dotenv langchain-openai aiohttp
+          # Install the LangGraph agent package with eval extras from manifests
+          pip install -e ai/langchain[eval]
 
       - name: Run evaluator
         env:
-          # Required by evaluators (OpenAI judge) and graph (LangSmith + Hugging Face)
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
           LANGSMITH_TRACING: true
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          EVAL_DATASET: ${{ inputs.dataset || 'test-dataset' }}
+          EVAL_EXPERIMENT_PREFIX: ${{ inputs.experiment_prefix || format('push-{0}', github.sha) }}
         run: |
-          python -c "import sys; sys.path.insert(0, 'ai/langchain/tests/integration_tests'); from eval_runner import main; import sys as _s; _s.exit(main(['eval', '${{ inputs.dataset }}', '${{ inputs.experiment_prefix }}']))"
+          python -c "import sys, os; sys.path.insert(0, 'ai/langchain/tests/integration_tests'); from eval_runner import main; sys.exit(main(['eval', os.environ['EVAL_DATASET'], os.environ['EVAL_EXPERIMENT_PREFIX']]))"
 
 
