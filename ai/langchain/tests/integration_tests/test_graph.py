@@ -22,20 +22,3 @@ def test_async_evaluation_with_run_wrapper():
     )
     assert isinstance(exp_name, str) and exp_name
     # Do not assert rows here unless you’re willing to wait/poll.
-
-
-if __name__ == "__main__":
-    import subprocess, sys
-    runner_path = os.path.join(CURRENT_DIR, "eval_runner.py")
-    subprocess.Popen(
-        [
-            sys.executable,
-            runner_path,
-            "test-dataset",
-            "ignored-prefix",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        env=os.environ.copy(),
-    )
-    # returns immediately; child process runs evaluation to completion
