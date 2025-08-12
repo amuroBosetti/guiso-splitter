@@ -31,7 +31,7 @@ jobs:
           # Install the LangGraph agent package in editable mode
           pip install -e ai/langchain
           # Install eval-time dependencies used by evaluators and runner
-          pip install "langchain>=0.2" "langchain-core>=0.2" "langchain-huggingface>=0.1" langsmith openevals python-dotenv langchain-openai
+          pip install "langchain>=0.2" "langchain-core>=0.2" "langchain-huggingface>=0.1" langsmith openevals python-dotenv langchain-openai aiohttp
 
       - name: Run evaluator
         env:
