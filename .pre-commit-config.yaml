@@ -3,7 +3,7 @@ repos:
    hooks:
     - id: run-evals
       name: Run evals
-      entry: bash -lc 'set -a; [ -f ai/langchain/.env ] && source ai/langchain/.env; set +a; pipenv --cwd ai/langchain run pytest -q ai/langchain/tests/integration_tests/test_graph.py'
-      language: python
+      entry: bash -lc 'set -a; [ -f ai/langchain/.env ] && source .env; set +a; cd ai && pipenv run python langchain/tests/integration_tests/test_graph.py'
+      language: system
       files: ^ai/langchain/src/agent/.*$
       pass_filenames: false

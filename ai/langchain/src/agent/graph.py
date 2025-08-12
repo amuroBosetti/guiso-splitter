@@ -19,7 +19,7 @@ Your task:
 3. Include common ingredients and seasonings
 4. Consider variations and optional ingredients that might be used
 5. Skip ingredients that are found in every house, such as 'salt' or 'water'
-6. Return the ingredients as a structured response
+6. Return the ingredients as a structured response.
 
 Respect the original language of the recipe name. If the recipe name is in English, return the ingredients in English. If the recipe name is in another language, return the ingredients in that language.
 If the recipe name language is Spanish, return the units in metric system
